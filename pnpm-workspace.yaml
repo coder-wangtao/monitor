@@ -1,0 +1,2 @@
+#用来指定工作空间的目录
+packages: -'packages/*';
