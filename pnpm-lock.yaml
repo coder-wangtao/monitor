@@ -91,6 +91,14 @@ importers:
         specifier: ^4.9.4
         version: 4.9.4
 
+  packages/common: {}
+
+  packages/core:
+    dependencies:
+      '@monitor/types':
+        specifier: workspace:^
+        version: link:../types
+
   packages/pkg1: {}
 
   packages/pkg2:
@@ -98,6 +106,17 @@ importers:
       '@monitor/pk1':
         specifier: workspace:^
         version: link:../pkg1
+
+  packages/types: {}
+
+  packages/utils:
+    dependencies:
+      '@monitor/common':
+        specifier: workspace:^
+        version: link:../common
+      '@monitor/types':
+        specifier: workspace:^
+        version: link:../types
 
 packages:
 
