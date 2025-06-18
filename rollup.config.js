@@ -1,7 +1,7 @@
-import fs from "fs";
-import path from "path";
-import typescript from "rollup-plugin-typescript2"; //用于处理 TypeScript 文件并将其编译成 JavaScript。
-const packagesDir = path.resolve(__dirname, "packages");
+import fs from 'fs';
+import path from 'path';
+import typescript from 'rollup-plugin-typescript2'; //用于处理 TypeScript 文件并将其编译成 JavaScript。
+const packagesDir = path.resolve(__dirname, 'packages');
 const packageFiles = fs.readdirSync(packagesDir);
 function output(path) {
   return [
@@ -10,8 +10,8 @@ function output(path) {
       output: [
         {
           file: `./packages/${path}/dist/index.js`,
-          format: "umd",
-          name: "monitor",
+          format: 'umd',
+          name: 'monitor',
           sourcemap: true,
         },
       ],
@@ -19,7 +19,7 @@ function output(path) {
         typescript({
           tsconfigOverride: {
             compilerOptions: {
-              module: "ESNext",
+              module: 'ESNext',
             },
           },
           useTsconfigDeclarationDir: true,
@@ -29,4 +29,4 @@ function output(path) {
   ];
 }
 
-export default [...packageFiles.map((path) => output(path)).flat()];
+export default [...packageFiles.map(path => output(path)).flat()];
