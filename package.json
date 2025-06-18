@@ -5,9 +5,13 @@
   "main": "index.js",
   "scripts": {
     "build": "rollup -c",
+    "prepare": "husky install",
+    "commit": "git-cz",
     "changeset": "changeset",
     "packages-version": "changeset version",
-    "publish": "changeset publish --registry=https://registry.npmjs.com/"
+    "publish": "changeset publish --registry=https://registry.npmjs.com/",
+    "release": "pnpm build && pnpm publish",
+    "lint": "eslint . --ext .js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix --ignore-path .gitignore"
   },
   "keywords": [],
   "author": "",
