@@ -45,6 +45,9 @@ importers:
       '@rollup/plugin-node-resolve':
         specifier: ^15.0.1
         version: 15.3.1(rollup@2.78.0)
+      '@types/ua-parser-js':
+        specifier: ^0.7.39
+        version: 0.7.39
       '@typescript-eslint/eslint-plugin':
         specifier: ^5.46.1
         version: 5.62.0(@typescript-eslint/parser@5.62.0(eslint@8.57.1)(typescript@4.9.4))(eslint@8.57.1)(typescript@4.9.4)
@@ -98,6 +101,9 @@ importers:
       '@monitor/types':
         specifier: workspace:^
         version: link:../types
+      '@monitor/utils':
+        specifier: workspace:^
+        version: link:../utils
 
   packages/pkg1: {}
 
@@ -107,7 +113,11 @@ importers:
         specifier: workspace:^
         version: link:../pkg1
 
-  packages/types: {}
+  packages/types:
+    dependencies:
+      '@monitor/common':
+        specifier: workspace:^
+        version: link:../common
 
   packages/utils:
     dependencies:
@@ -437,6 +447,9 @@ packages:
 
   '@types/semver@7.7.0':
     resolution: {integrity: sha512-k107IF4+Xr7UHjwDc7Cfd6PRQfbdkiRabXGRjo07b4WyPahFBZCZ1sE+BNxYIJPPg73UkfOsVOLwqVc/6ETrIA==}
+
+  '@types/ua-parser-js@0.7.39':
+    resolution: {integrity: sha512-P/oDfpofrdtF5xw433SPALpdSchtJmY7nsJItf8h3KXqOslkbySh8zq4dSWXH2oTjRvJ5PczVEoCZPow6GicLg==}
 
   '@typescript-eslint/eslint-plugin@5.62.0':
     resolution: {integrity: sha512-TiZzBSJja/LbhNPvk6yc0JrX9XqhQ0hdh6M2svYfsHGejaKFIAGd9MQ+ERIMzLGlN/kZoYIgdxFV0PuljTKXag==}
@@ -2769,6 +2782,8 @@ snapshots:
   '@types/resolve@1.20.2': {}
 
   '@types/semver@7.7.0': {}
+
+  '@types/ua-parser-js@0.7.39': {}
 
   '@typescript-eslint/eslint-plugin@5.62.0(@typescript-eslint/parser@5.62.0(eslint@8.57.1)(typescript@4.9.4))(eslint@8.57.1)(typescript@4.9.4)':
     dependencies:
