@@ -15,7 +15,7 @@ export interface InitOptions {
   silentRecordScreen?: boolean; //是否开启录屏
   recordScreenTime?: boolean; //单次录屏时长
   recordScreenTypeList?: string[]; //上报录屏的错误列表
-  silentWithScreen?: boolean; //是否开启白屏检查
+  silentWhiteScreen?: boolean; //是否开启白屏检查
   skeletonProject?: boolean; //白屏检测的项目是否有骨架屏
   whiteBoxElements?: string[]; //白屏检测的容器列表
   filterXhrUrlRegExp?: RegExp; //过滤的接口请求正则

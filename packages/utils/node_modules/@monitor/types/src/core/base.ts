@@ -99,7 +99,7 @@ export interface CodeError {
 }
 
 export interface RecordScreen {
-  RecordScreenId: string; //录屏id
+  recordScreenId: string; //录屏id
   events: string; //录屏内容
 }
 
@@ -151,4 +151,19 @@ export interface Monitor {
     //设备信息
     [key: string]: any;
   };
+}
+
+export interface Callback {
+  (...args: any[]): any;
+}
+
+export interface ReplaceHandler {
+  type: EventTypes;
+  callback: Callback;
+}
+
+export type ReplaceCallback = (data: any) => void;
+
+export interface IAnyObject {
+  [key: string]: any;
 }

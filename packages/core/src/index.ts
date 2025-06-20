@@ -7,5 +7,7 @@ function init(options: InitOptions) {
     return console.error(`monitor 缺少必须的配置项：${!options.dsn ? 'dns' : 'apiKey'}`);
   }
   if (!('fetch' in _global) || options.disabled) return;
+  //初始化配置
   handleOptions(options);
+  setupReplace();
 }

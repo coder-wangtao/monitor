@@ -1,10 +1,15 @@
 import { Monitor } from '@monitor/types';
 import { UAParser } from 'ua-parser-js'; //获取浏览器和系统的信息
+import { variableTypeDetection } from './verifyType';
 export function getGlobal(): any {
   return window;
 }
 
 const _global = getGlobal();
+
+export const isBrowserEnv = variableTypeDetection.isWindow(
+  typeof window !== 'undefined' ? window : 0
+);
 
 export function getGlobalSupport() {
   _global.__monitor__ = _global.__monitor__ || ({} as Monitor);
