@@ -1,6 +1,7 @@
 import { InitOptions } from '@monitor/types';
 import { _global } from '@monitor/utils';
 import { handleOptions } from './core/options';
+import { setupReplace } from './core';
 
 function init(options: InitOptions) {
   if (!options.dsn || !options.apiKey) {

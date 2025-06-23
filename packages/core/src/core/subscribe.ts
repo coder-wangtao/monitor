@@ -1,6 +1,6 @@
 import { EventTypes } from '@monitor/common';
 import { ReplaceCallback, ReplaceHandler } from '@monitor/types';
-import { getFlag, setFlag } from '@monitor/utils';
+import { getFlag, nativeTryCatch, setFlag } from '@monitor/utils';
 
 const handlers: { [key in EventTypes]?: ReplaceCallback[] } = {};
 
@@ -11,4 +11,16 @@ export function subscribeEvent(handler: ReplaceHandler): boolean {
   handlers[handler.type] = handlers[handler.type] || [];
   handlers[handler.type]?.push(handler.callback);
   return true;
+}
+
+export function notify(type: EventTypes, data: any) {
+  if (!type || !handlers[type]) return;
+  handlers[type]?.forEach(callback => {
+    nativeTryCatch(
+      () => callback(data),
+      () => {
+        console.error('发生错误');
+      }
+    );
+  });
 }
