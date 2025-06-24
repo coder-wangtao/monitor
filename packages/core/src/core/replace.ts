@@ -1,7 +1,16 @@
 import { ReplaceHandler, voidFun } from '@monitor/types';
 import { notify, subscribeEvent } from './subscribe';
 import { EMethods, EventTypes, HttpType } from '@monitor/common';
-import { _global, getTimestamp, on, replaceAop, variableTypeDetection } from '@monitor/utils';
+import {
+  _global,
+  getLocationHref,
+  getTimestamp,
+  on,
+  replaceAop,
+  supportsHistory,
+  throttle,
+  variableTypeDetection,
+} from '@monitor/utils';
 import { transportData } from './reportData';
 import { options } from './options';
 
@@ -16,6 +25,19 @@ function replace(type: EventTypes): void {
       break;
     case EventTypes.FETCH:
       fetchReplace();
+      break;
+    case EventTypes.ERROR:
+      listenError();
+      break;
+    case EventTypes.HISTORY:
+      historyReplace();
+      break;
+    case EventTypes.UNHANDLEDREJECTION:
+      unhandledRejectionReplace();
+      break;
+    case EventTypes.CLICK:
+      domReplace();
+      break;
   }
 }
 
@@ -166,4 +188,75 @@ function fetchReplace(): void {
       );
     };
   });
+}
+
+function listenError(): void {
+  on(
+    _global,
+    'error',
+    function (e: ErrorEvent) {
+      console.log(e);
+      notify(EventTypes.ERROR, e);
+    },
+    true
+  );
+}
+
+// last time route
+let lastHref: string = getLocationHref();
+function historyReplace(): void {
+  //是否支持history
+  if (!supportsHistory()) return;
+  const oldOnpopstate = _global.onpopstate;
+  _global.onpopstate = function (this: any, ...args: any): void {
+    const to = getLocationHref();
+    const from = lastHref;
+    lastHref = to;
+    notify(EventTypes.HISTORY, {
+      from,
+      to,
+    });
+    oldOnpopstate && oldOnpopstate.apply(this, args);
+  };
+  function historyReplaceFn(originalHistoryFn: voidFun): voidFun {
+    return function (this: any, ...args: any[]): void {
+      const url = args.length > 2 ? args[2] : undefined;
+      if (url) {
+        const from = lastHref;
+        const to = String(url);
+        lastHref = to;
+        notify(EventTypes.HISTORY, {
+          from,
+          to,
+        });
+      }
+      return originalHistoryFn.apply(this, args);
+    };
+  }
+  replaceAop(_global.history, 'pushState', historyReplaceFn);
+  replaceAop(_global.history, 'replaceState', historyReplaceFn);
+}
+
+function unhandledRejectionReplace(): void {
+  on(_global, EventTypes.UNHANDLEDREJECTION, function (ev: PromiseRejectionEvent) {
+    // ev.preventDefault() 阻止默认行为后，控制台就不会再报红色错误
+    notify(EventTypes.UNHANDLEDREJECTION, ev);
+  });
+}
+
+function domReplace(): void {
+  if (!('document' in _global)) return;
+  //节流，默认0s
+  const clickThrottle = throttle(notify, options.throttleDelayTime);
+  on(
+    _global.document,
+    'click',
+    function (this: any): void {
+      clickThrottle(EventTypes.CLICK, {
+        category: 'click',
+        data: this,
+      });
+    },
+    true
+  );
 }

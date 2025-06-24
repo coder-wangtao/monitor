@@ -167,3 +167,30 @@ export type ReplaceCallback = (data: any) => void;
 export interface IAnyObject {
   [key: string]: any;
 }
+
+export interface ErrorTarget {
+  target: {
+    localName?: string;
+  };
+  error?: any;
+  message?: string;
+}
+
+export interface ResourceTarget {
+  src?: string;
+  href?: string;
+  localName?: string;
+}
+/**
+ *资源加载失败
+ **/
+export interface ResourceError {
+  time: number;
+  message: string; //加载失败的信息
+  name: string; //脚本类型:js脚本
+}
+
+export interface RouteHistory {
+  from: string;
+  to: string;
+}

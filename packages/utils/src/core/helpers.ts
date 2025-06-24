@@ -1,4 +1,5 @@
 import { Callback, IAnyObject } from '@monitor/types';
+import { variableTypeDetection } from './verifyType';
 
 export function getTimestamp(): number {
   return Date.now();
@@ -78,3 +79,46 @@ export function replaceAop(
 export function on(target: any, eventName: string, handler: Callback, options = false) {
   target.addEventListener(eventName, handler, options);
 }
+
+/**
+ * @param str 目标字符串
+ * @param interceptLength 截取的字符串长度
+ * @returns 截取字符串
+ */
+export function interceptStr(str: string, interceptLength: number): string {
+  if (variableTypeDetection.isString(str)) {
+    return (
+      str.slice(0, interceptLength) +
+      (str.length > interceptLength ? `截取前${interceptLength}个字符` : '')
+    );
+  }
+  return '';
+}
+
+export function unknownToString(target: unknown): string {
+  if (variableTypeDetection.isString(target)) {
+    return target as string;
+  }
+  if (variableTypeDetection.isUndefined(target)) {
+    return 'undefined';
+  }
+  return JSON.stringify(target);
+}
+
+/**
+ * 函数节流
+ * fn 需要节流的函数
+ * delay 节流的时间间隔
+ * 返回一个包含节流功能的函数
+ */
+export const throttle = (fn: any, delay: number) => {
+  let canRun = true;
+  return function (this: any, ...args: any[]) {
+    if (!canRun) return;
+    fn.apply(this, args);
+    canRun = false;
+    setTimeout(() => {
+      canRun = true;
+    }, delay);
+  };
+};

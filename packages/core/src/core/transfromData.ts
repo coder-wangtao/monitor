@@ -1,7 +1,7 @@
 import { HttpCode, HttpType, StatusCode } from '@monitor/common';
-import { HttpData } from '@monitor/types';
+import { HttpData, ResourceError, ResourceTarget } from '@monitor/types';
 import { options } from './options';
-import { fromHttpStatus } from '@monitor/utils';
+import { fromHttpStatus, getTimestamp, interceptStr } from '@monitor/utils';
 
 export function httpTransform(data: HttpData): HttpData {
   let message: any = '';
@@ -46,5 +46,15 @@ export function httpTransform(data: HttpData): HttpData {
       Status,
       data: status === StatusCode.ERROR ? response : null,
     },
+  };
+}
+
+export function resourceTransform(target: ResourceTarget): ResourceError {
+  return {
+    time: getTimestamp(),
+    message:
+      (interceptStr(target.src as string, 120) || interceptStr(target.href as string, 120)) +
+      '; 资源加载失败',
+    name: target.localName as string,
   };
 }

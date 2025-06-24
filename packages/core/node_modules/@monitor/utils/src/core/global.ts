@@ -64,3 +64,17 @@ export function hashMapExist(hash: string): boolean {
 }
 
 export { _global, _support };
+/**
+ *
+ * @returns 如果 isChromePackagedApp 为 true，表示代码运行在一个 Chrome 打包应用中（不过要注意，Chrome 打包应用已经被弃用）。
+ * 如果 false，则表示当前不是在 Chrome 打包应用环境中，可能是在普通的网页或者扩展中运行。
+ */
+export function supportsHistory(): boolean {
+  const chrome = _global.chrome;
+  const isChromePackagedApp = chrome && chrome.app && chrome.app.runtime;
+  const hasHistoryApi =
+    'history' in _global &&
+    !!(_global.history as History).pushState &&
+    !!(_global.history as History).replaceState;
+  return !isChromePackagedApp && hasHistoryApi;
+}
