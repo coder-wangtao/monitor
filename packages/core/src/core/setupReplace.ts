@@ -65,4 +65,12 @@ export function setupReplace(): void {
     },
     type: EventTypes.HASHCHANGE,
   });
+
+  //白屏检测
+  addReplaceHandler({
+    callback: () => {
+      HandleEvents.handleWhiteScreen();
+    },
+    type: EventTypes.WHITE_SCREEN,
+  });
 }

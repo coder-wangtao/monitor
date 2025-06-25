@@ -1,0 +1,15 @@
+{
+  "name": "@monitor/performance",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "publishConfig": {
+    "main": "dist/index.js"
+  },
+  "files": [
+    "dist"
+  ],
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}

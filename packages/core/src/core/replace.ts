@@ -38,6 +38,9 @@ function replace(type: EventTypes): void {
     case EventTypes.CLICK:
       domReplace();
       break;
+    case EventTypes.WHITE_SCREEN:
+      whiteScreen();
+      break;
   }
 }
 
@@ -259,4 +262,8 @@ function domReplace(): void {
     },
     true
   );
+}
+
+function whiteScreen(): void {
+  notify(EventTypes.WHITE_SCREEN);
 }

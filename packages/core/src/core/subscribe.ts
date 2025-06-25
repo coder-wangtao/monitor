@@ -13,7 +13,7 @@ export function subscribeEvent(handler: ReplaceHandler): boolean {
   return true;
 }
 
-export function notify(type: EventTypes, data: any) {
+export function notify(type: EventTypes, data?: any) {
   if (!type || !handlers[type]) return;
   handlers[type]?.forEach(callback => {
     nativeTryCatch(

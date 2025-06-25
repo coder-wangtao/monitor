@@ -12,6 +12,7 @@ import {
   parseUrlToObj,
   unknownToString,
 } from '@monitor/utils';
+import { openWithScreen } from './whiteScreen';
 
 const HandleEvents = {
   // 处理xhr、fetch回调
@@ -140,6 +141,18 @@ const HandleEvents = {
       time: getTimestamp(),
       status: StatusCode.OK,
     });
+  },
+
+  //白屏检测
+  handleWhiteScreen(): void {
+    openWithScreen((res: any) => {
+      // 上报白屏检测信息
+      transportData.send({
+        type: EventTypes.WHITE_SCREEN,
+        time: getTimestamp(),
+        ...res,
+      });
+    }, options);
   },
 };
 
