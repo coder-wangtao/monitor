@@ -1,7 +1,7 @@
 import { EventTypes, StatusCode } from '@monitor/common';
 import { BasePlugin, SdkBase } from '@monitor/types';
 import { getResource, getWebVitals } from './core/performance';
-import { _global, getTimestamp, on, setFlag } from '@monitor/utils';
+import { _global, getTimestamp, on } from '@monitor/utils';
 
 export default class WebPerformance extends BasePlugin {
   constructor() {

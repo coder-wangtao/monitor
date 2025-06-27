@@ -29,3 +29,8 @@ export interface InitOptions {
   handleHttpStatus?: (data: any) => boolean; //处理接口返回的response
   repeatCodeError?: boolean; //是否去除重复的代码错误，重复的错误只上报一次
 }
+
+export interface RecordScreenOption {
+  recordScreenTypeList: string[];
+  recordScreenTime: number;
+}

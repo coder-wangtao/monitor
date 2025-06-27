@@ -1,5 +1,5 @@
 import { EventTypes } from '@monitor/common';
-import { setFlag } from './global';
+import { _support, setFlag } from './global';
 
 /**
  * 将传入的 HTML 元素转换为一个简单的 HTML 字符串表示。具体来说，它会提取元素的标签名、类名、ID 以及内部文本，拼接成一个 HTML 字符串。
@@ -66,4 +66,17 @@ export function parseUrlToObj(url: string) {
     protocol: match[2],
     relative: match[5] + query + fragment,
   };
+}
+
+//对每一个错误详情，生成唯一的编码
+export function getErrorUid(input: string): string {
+  return window.btoa(encodeURIComponent(input));
+}
+
+export function hashMapExist(hash: string): boolean {
+  const exist = _support.errorMap.has(hash);
+  if (!exist) {
+    _support.errorMap.set(hash, true);
+  }
+  return exist;
 }

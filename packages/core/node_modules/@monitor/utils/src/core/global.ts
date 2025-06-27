@@ -6,6 +6,8 @@ export function getGlobal(): any {
 }
 
 const _global = getGlobal();
+const uaResult = new UAParser().getResult();
+const _support = getGlobalSupport();
 
 export const isBrowserEnv = variableTypeDetection.isWindow(
   typeof window !== 'undefined' ? window : 0
@@ -15,10 +17,6 @@ export function getGlobalSupport() {
   _global.__monitor__ = _global.__monitor__ || ({} as Monitor);
   return _global.__monitor__;
 }
-
-const uaResult = new UAParser().getResult();
-
-const _support = getGlobalSupport();
 
 // 获取设备信息
 _support.deviceInfo = {
@@ -48,19 +46,6 @@ export function setFlag(replaceType: string, isSet: boolean) {
 
 export function getFlag(replaceType: string) {
   return replaceFlag[replaceType] ? true : false;
-}
-
-//对每一个错误详情，生成唯一的编码
-export function getErrorUid(input: string): string {
-  return window.btoa(encodeURIComponent(input));
-}
-
-export function hashMapExist(hash: string): boolean {
-  const exist = _support.errorMap.has(hash);
-  if (!exist) {
-    _support.errorMap.set(hash, true);
-  }
-  return exist;
 }
 
 export { _global, _support };
