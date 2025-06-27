@@ -1,5 +1,4 @@
 import { EventTypes } from '@monitor/common';
-import { RecordScreen } from './../../types/src/core/base';
 import { BasePlugin, RecordScreenOption, SdkBase } from '@monitor/types';
 import { _support, generateUUID, validateOption } from '@monitor/utils';
 import { handleScreen } from './core/recordscreen';
