@@ -130,49 +130,65 @@ function fetchReplace(): void {
         setRequestHeader: headers.set,
       });
       config = Object.assign({}, config, headers);
-      return originalFetch.apply(_global, [url, config]).then(
-        (res: any) => {
-          // 克隆一份，防止被标记已消费
-          const tempRes = res.clone();
-          const eTime = getTimestamp();
-          fetchData = Object.assign({}, fetchData, {
-            elapsedTime: eTime - sTime,
-            Status: tempRes.status,
-            time: sTime,
-          });
-          tempRes.text().then((data: any) => {
-            // 同理，进接口进行过滤
+      try {
+        return originalFetch.apply(_global, [url, config]).then(
+          (res: any) => {
+            // 克隆一份，防止被标记已消费
+            const tempRes = res.clone();
+            const eTime = getTimestamp();
+            fetchData = Object.assign({}, fetchData, {
+              elapsedTime: eTime - sTime,
+              Status: tempRes.status,
+              time: sTime,
+            });
+            tempRes.text().then((data: any) => {
+              // 同理，进接口进行过滤
+              if (
+                (method === EMethods.Post && transportData.isSdkTransportUrl(url)) ||
+                isFilterHttpUrl(url)
+              )
+                return;
+              // 用户设置handleHttpStatus函数来判断接口是否正确，只有接口报错时才保留response
+              if (options.handleHttpStatus && typeof options.handleHttpStatus == 'function') {
+                fetchData.response = data;
+              }
+              notify(EventTypes.FETCH, fetchData);
+            });
+
+            return res;
+          },
+          // 接口报错
+          (err: any) => {
+            const eTime = getTimestamp();
             if (
               (method === EMethods.Post && transportData.isSdkTransportUrl(url)) ||
               isFilterHttpUrl(url)
             )
               return;
-            // 用户设置handleHttpStatus函数来判断接口是否正确，只有接口报错时才保留response
-            if (options.handleHttpStatus && typeof options.handleHttpStatus == 'function') {
-              fetchData.response = data;
-            }
+            fetchData = Object.assign({}, fetchData, {
+              elapsedTime: eTime - sTime,
+              status: 0,
+              time: sTime,
+            });
             notify(EventTypes.FETCH, fetchData);
-          });
-
-          return res;
-        },
-        // 接口报错
-        (err: any) => {
-          const eTime = getTimestamp();
-          if (
-            (method === EMethods.Post && transportData.isSdkTransportUrl(url)) ||
-            isFilterHttpUrl(url)
-          )
-            return;
-          fetchData = Object.assign({}, fetchData, {
-            elapsedTime: eTime - sTime,
-            status: 0,
-            time: sTime,
-          });
-          notify(EventTypes.FETCH, fetchData);
-          throw err;
-        }
-      );
+            throw err;
+          }
+        );
+      } catch (err) {
+        const eTime = getTimestamp();
+        if (
+          (method === EMethods.Post && transportData.isSdkTransportUrl(url)) ||
+          isFilterHttpUrl(url)
+        )
+          return;
+        fetchData = Object.assign({}, fetchData, {
+          elapsedTime: eTime - sTime,
+          status: 0,
+          time: sTime,
+        });
+        notify(EventTypes.FETCH, fetchData);
+        throw err;
+      }
     };
   });
 }

@@ -120,7 +120,7 @@ export default {
     },
     fetchError() {
       try {
-        fetch('https://abc.com/test/api', {
+        fetch('https://jsonplaceholder.typicode.com/posts/a', {
           method: 'POST',
           header: {
             'Content-Type': 'application/json;charset=UTF-8',
