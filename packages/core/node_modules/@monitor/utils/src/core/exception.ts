@@ -8,6 +8,6 @@ export function nativeTryCatch(fn: any, errorFn?: any) {
   try {
     fn();
   } catch (err) {
-    errorFn(err);
+    errorFn && errorFn(err);
   }
 }

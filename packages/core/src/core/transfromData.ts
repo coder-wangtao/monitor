@@ -1,4 +1,4 @@
-import { HttpCode, HttpType, StatusCode } from '@monitor/common';
+import { HttpCode, StatusCode } from '@monitor/common';
 import { HttpData, ResourceError, ResourceTarget } from '@monitor/types';
 import { options } from './options';
 import { fromHttpStatus, getTimestamp, interceptStr } from '@monitor/utils';

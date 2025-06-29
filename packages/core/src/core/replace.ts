@@ -142,7 +142,7 @@ function fetchReplace(): void {
         url,
         response: '',
       };
-      //获取配置的headers
+      // 获取配置的headers
       const headers = new Headers(config.headers || {});
       Object.assign(headers, {
         setRequestHeader: headers.set,
@@ -150,7 +150,7 @@ function fetchReplace(): void {
       config = Object.assign({}, config, headers);
       return originalFetch.apply(_global, [url, config]).then(
         (res: any) => {
-          //克隆一份，防止被标记已消费
+          // 克隆一份，防止被标记已消费
           const tempRes = res.clone();
           const eTime = getTimestamp();
           fetchData = Object.assign({}, fetchData, {
@@ -159,20 +159,21 @@ function fetchReplace(): void {
             time: sTime,
           });
           tempRes.text().then((data: any) => {
-            //同理，对接口进行过滤
+            // 同理，进接口进行过滤
             if (
               (method === EMethods.Post && transportData.isSdkTransportUrl(url)) ||
               isFilterHttpUrl(url)
-            ) {
+            )
               return;
-            }
-            //用户设置handleHttpStatus函数来判断接口是否正确，只有接口报错时才保留response
+            // 用户设置handleHttpStatus函数来判断接口是否正确，只有接口报错时才保留response
             if (options.handleHttpStatus && typeof options.handleHttpStatus == 'function') {
               fetchData.response = data;
             }
             notify(EventTypes.FETCH, fetchData);
           });
+          return res;
         },
+        // 接口报错
         (err: any) => {
           const eTime = getTimestamp();
           if (

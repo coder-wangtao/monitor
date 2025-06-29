@@ -130,7 +130,7 @@ export class TransportData {
   //上报数据
   async send(data: ReportData) {
     const dsn = this.errorDsn;
-    if (!isEmpty(dsn)) {
+    if (isEmpty(dsn)) {
       console.error('monitor: dsn为空，没有传入监控错误上报的dsn地址，请在init中传入');
       return;
     }

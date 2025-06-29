@@ -98,6 +98,9 @@ importers:
 
   packages/core:
     dependencies:
+      '@monitor/common':
+        specifier: workspace:^
+        version: link:../common
       '@monitor/types':
         specifier: workspace:^
         version: link:../types
