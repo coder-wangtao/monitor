@@ -26,37 +26,34 @@ import { _global, _support } from '@monitor/utils';
  * @param {array} whiteBoxElements - 容器列表，默认值为['html', 'body', '#app', '#root']
  */
 
-export function openWithScreen(
+export function openWhiteScreen(
   callback: Callback,
   { skeletonProject, whiteBoxElements }: InitOptions
 ) {
   let _whiteLoopNum = 0;
-  const _skeletonInitList: any = []; //存储初次采样点
-  let _skeletonNowList: any = []; //存储当前采样点
+  const _skeletonInitList: any = []; // 存储初次采样点
+  let _skeletonNowList: any = []; // 存储当前采样点
 
-  //项目有骨架屏
+  // 项目有骨架屏
   if (skeletonProject) {
-    //项目有骨架屏的情况，还有没加载就开始
-    if (document.readyState !== 'complete') {
+    if (document.readyState != 'complete') {
       idleCallback();
     }
   } else {
-    //页面加载完毕
-    //你可以通过检查 document.readyState 来判断页面是否完全加载。
-    //通常用在非 window.onload 的场景下，或者想要通过 JS 控制在页面加载完成时执行一些操作。
+    // 页面加载完毕
     if (document.readyState === 'complete') {
       idleCallback();
     } else {
-      //它会在页面及所有资源（图片、CSS、JS 等）加载完成后触发。
-      // 比 document.readyState 更为常用，因为它能够确保页面的所有资源都加载完毕。
       _global.addEventListener('load', idleCallback);
     }
   }
 
+  // 选中dom点的名称
   function getSelector(element: any) {
     if (element.id) {
       return '#' + element.id;
     } else if (element.className) {
+      // div home => div.home
       return (
         '.' +
         element.className
@@ -68,16 +65,15 @@ export function openWithScreen(
       return element.nodeName.toLowerCase();
     }
   }
-
+  // 判断采样点是否为容器节点
   function isContainer(element: HTMLElement) {
     const selector = getSelector(element);
     if (skeletonProject) {
       _whiteLoopNum ? _skeletonNowList.push(selector) : _skeletonInitList.push(selector);
     }
-    return whiteBoxElements?.indexOf(selector) !== -1;
+    return whiteBoxElements?.indexOf(selector) != -1;
   }
-
-  //采样对比
+  // 采样对比
   function sampling() {
     let emptyPoints = 0;
     for (let i = 1; i <= 9; i++) {
@@ -90,43 +86,43 @@ export function openWithScreen(
         (_global.innerHeight * i) / 10
       );
       if (isContainer(xElements[0] as HTMLElement)) emptyPoints++;
-      if (i !== 5) {
+      // 中心点只计算一次
+      if (i != 5) {
         if (isContainer(yElements[0] as HTMLElement)) emptyPoints++;
       }
     }
+    // console.log('_skeletonInitList', _skeletonInitList, _skeletonNowList);
 
-    if (emptyPoints !== 17) {
-      // 页面正常渲染，停止轮训
+    // 页面正常渲染，停止轮训
+    if (emptyPoints != 17) {
       if (skeletonProject) {
-        //第一次不比较
+        // 第一次不比较
         if (!_whiteLoopNum) return openWhiteLoop();
-        //比较前后dom是否一致
-        if (_skeletonNowList.join() === _skeletonInitList.join()) {
+        // 比较前后dom是否一致
+        if (_skeletonNowList.join() == _skeletonInitList.join())
           return callback({
             status: StatusCode.ERROR,
           });
-        }
       }
       if (_support._loopTimer) {
         clearTimeout(_support._loopTimer);
         _support._loopTimer = null;
       }
     } else {
-      //开启轮训
+      // 开启轮训
       if (!_support._loopTimer) {
         openWhiteLoop();
       }
     }
-
+    // 17个点都是容器节点算作白屏
     callback({
-      status: emptyPoints === 17 ? StatusCode.ERROR : StatusCode.OK,
+      status: emptyPoints == 17 ? StatusCode.ERROR : StatusCode.OK,
     });
   }
-
-  //开启白屏轮训
+  // 开启白屏轮训
   function openWhiteLoop(): void {
-    if (_support.loopTimer) return;
-    _support.loopTimer = setInterval(() => {
+    if (_support._loopTimer) return;
+    _support._loopTimer = setInterval(() => {
       if (skeletonProject) {
         _whiteLoopNum++;
         _skeletonNowList = [];
@@ -134,7 +130,6 @@ export function openWithScreen(
       idleCallback();
     }, 1000);
   }
-
   function idleCallback() {
     if ('requestIdleCallback' in _global) {
       requestIdleCallback(deadline => {

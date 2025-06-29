@@ -1,15 +1,15 @@
+import { getWebVitals, getResource } from './core/performance';
+import { SdkBase, BasePlugin } from '@monitor/types';
 import { EventTypes, StatusCode } from '@monitor/common';
-import { BasePlugin, SdkBase } from '@monitor/types';
-import { getResource, getWebVitals } from './core/performance';
-import { _global, getTimestamp, on } from '@monitor/utils';
+import { getTimestamp, _global, on } from '@monitor/utils';
 
 export default class WebPerformance extends BasePlugin {
+  type: string;
   constructor() {
     super(EventTypes.PERFORMANCE);
-    this.type == EventTypes.PERFORMANCE;
+    this.type = EventTypes.PERFORMANCE;
   }
   bindOptions() {}
-
   core({ transportData }: SdkBase) {
     // 获取FCP、LCP、TTFB、FID等指标
     getWebVitals((res: any) => {
@@ -27,9 +27,10 @@ export default class WebPerformance extends BasePlugin {
 
     const observer = new PerformanceObserver(list => {
       for (const long of list.getEntries()) {
+        // 上报长任务详情
         transportData.send({
           type: EventTypes.PERFORMANCE,
-          name: 'longtask',
+          name: 'longTask',
           longTask: long,
           time: getTimestamp(),
           status: StatusCode.OK,
@@ -39,7 +40,7 @@ export default class WebPerformance extends BasePlugin {
     observer.observe({ entryTypes: ['longtask'] });
 
     on(_global, 'load', function () {
-      //上报资源列表
+      // 上报资源列表
       transportData.send({
         type: EventTypes.PERFORMANCE,
         name: 'resourceList',
@@ -47,17 +48,21 @@ export default class WebPerformance extends BasePlugin {
         status: StatusCode.OK,
         resourceList: getResource(),
       });
-      //上报内存情况, safari、firefox不支持该属性
-      if (performance.memory) {
+
+      // 上报内存情况, safari、firefox不支持该属性
+      if ((performance as any).memory) {
         transportData.send({
           type: EventTypes.PERFORMANCE,
           name: 'memory',
           time: getTimestamp(),
           status: StatusCode.OK,
           memory: {
-            jsHeapSizeLimit: performance.memory && performance.memory.jsHeapSizeLimit,
-            totalJSHeapSize: performance.memory && performance.memory.totalJSHeapSize,
-            usedJSHeapSize: performance.memory && performance.memory.usedJSHeapSize,
+            jsHeapSizeLimit:
+              (performance as any).memory && (performance as any).memory.jsHeapSizeLimit,
+            totalJSHeapSize:
+              (performance as any).memory && (performance as any).memory.totalJSHeapSize,
+            usedJSHeapSize:
+              (performance as any).memory && (performance as any).memory.usedJSHeapSize,
           },
         });
       }

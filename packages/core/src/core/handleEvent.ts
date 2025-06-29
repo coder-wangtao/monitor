@@ -1,18 +1,21 @@
-import { EventTypes, StatusCode } from '@monitor/common';
-import { ErrorTarget, HttpData, RouteHistory } from '@monitor/types';
-import { httpTransform, resourceTransform } from './transfromData';
-import { options } from './options';
-import { breadCrumb } from './breadcrumb';
-import { transportData } from './reportData';
 import ErrorStackParser from 'error-stack-parser';
 import {
+  openWhiteScreen,
+  transportData,
+  breadcrumb,
+  resourceTransform,
+  httpTransform,
+  options,
+} from './index';
+import { EventTypes, StatusCode } from '@monitor/common';
+import {
   getErrorUid,
-  getTimestamp,
   hashMapExist,
+  getTimestamp,
   parseUrlToObj,
   unknownToString,
 } from '@monitor/utils';
-import { openWithScreen } from './whiteScreen';
+import { ErrorTarget, RouteHistory, HttpData } from '@monitor/types';
 
 const HandleEvents = {
   // 处理xhr、fetch回调
@@ -20,16 +23,18 @@ const HandleEvents = {
     const result = httpTransform(data);
     // 添加用户行为，去掉自身上报的接口行为
     if (!data.url.includes(options.dsn)) {
-      breadCrumb.push({
+      breadcrumb.push({
         type,
-        category: breadCrumb.getCategory(type),
+        category: breadcrumb.getCategory(type),
         data: result,
         status: result.status,
         time: data.time,
       });
     }
+
     if (result.status === 'error') {
-      transportData.send({ ...result, status: StatusCode.ERROR });
+      // 上报接口错误
+      transportData.send({ ...result, type, status: EventTypes.ERROR });
     }
   },
 
@@ -48,9 +53,9 @@ const HandleEvents = {
         line: lineNumber,
         column: columnNumber,
       };
-      breadCrumb.push({
+      breadcrumb.push({
         type: EventTypes.ERROR,
-        category: breadCrumb.getCategory(EventTypes.ERROR),
+        category: breadcrumb.getCategory(EventTypes.ERROR),
         data: errorData,
         time: getTimestamp(),
         status: StatusCode.ERROR,
@@ -63,12 +68,14 @@ const HandleEvents = {
         return transportData.send(errorData);
       }
     }
-    //资源加载报错
+
+    // 资源加载报错
     if (target?.localName) {
+      // 提取资源加载的信息
       const data = resourceTransform(target);
-      breadCrumb.push({
+      breadcrumb.push({
         type: EventTypes.RESOURCE,
-        category: breadCrumb.getCategory(EventTypes.RESOURCE),
+        category: breadcrumb.getCategory(EventTypes.RESOURCE),
         status: StatusCode.ERROR,
         time: getTimestamp(),
         data,
@@ -83,12 +90,12 @@ const HandleEvents = {
 
   handleHistory(data: RouteHistory): void {
     const { from, to } = data;
-    //定义parsedFrom变量,值为relative
+    // 定义parsedFrom变量，值为relative
     const { relative: parsedFrom } = parseUrlToObj(from);
     const { relative: parsedTo } = parseUrlToObj(to);
-    breadCrumb.push({
+    breadcrumb.push({
       type: EventTypes.HISTORY,
-      category: breadCrumb.getCategory(EventTypes.HISTORY),
+      category: breadcrumb.getCategory(EventTypes.HISTORY),
       data: {
         from: parsedFrom ? parsedFrom : '/',
         to: parsedTo ? parsedTo : '/',
@@ -98,42 +105,13 @@ const HandleEvents = {
     });
   },
 
-  handleUnhandledRejection(ev: PromiseRejectionEvent): void {
-    const stackFrame = ErrorStackParser.parse(ev.reason)[0];
-    const { fileName, columnNumber, lineNumber } = stackFrame;
-    const message = unknownToString(ev.reason.message || ev.reason.stack);
-    const data = {
-      type: EventTypes.UNHANDLEDREJECTION,
-      status: StatusCode.ERROR,
-      time: getTimestamp(),
-      message,
-      fileName,
-      line: lineNumber,
-      column: columnNumber,
-    };
-    breadCrumb.push({
-      type: EventTypes.UNHANDLEDREJECTION,
-      category: breadCrumb.getCategory(EventTypes.UNHANDLEDREJECTION),
-      time: getTimestamp(),
-      status: StatusCode.ERROR,
-      data,
-    });
-    const hash: string = getErrorUid(
-      `${EventTypes.UNHANDLEDREJECTION}-${message}-${fileName}-${columnNumber}`
-    );
-    // 开启repeatCodeError第一次报错才上报
-    if (!options.repeatCodeError || (options.repeatCodeError && !hashMapExist(hash))) {
-      return transportData.send(data);
-    }
-  },
-
   handleHashchange(data: HashChangeEvent): void {
     const { oldURL, newURL } = data;
     const { relative: from } = parseUrlToObj(oldURL);
     const { relative: to } = parseUrlToObj(newURL);
-    breadCrumb.push({
+    breadcrumb.push({
       type: EventTypes.HASHCHANGE,
-      category: breadCrumb.getCategory(EventTypes.HASHCHANGE),
+      category: breadcrumb.getCategory(EventTypes.HASHCHANGE),
       data: {
         from,
         to,
@@ -143,9 +121,40 @@ const HandleEvents = {
     });
   },
 
-  //白屏检测
+  handleUnhandleRejection(ev: PromiseRejectionEvent): void {
+    const stackFrame = ErrorStackParser.parse(ev.reason)[0];
+    const { fileName, columnNumber, lineNumber } = stackFrame;
+    const message = unknownToString(ev.reason.message || ev.reason.stack);
+
+    const data = {
+      type: EventTypes.UNHANDLEDREJECTION,
+      status: StatusCode.ERROR,
+      time: getTimestamp(),
+      message,
+      fileName,
+      line: lineNumber,
+      column: columnNumber,
+    };
+
+    breadcrumb.push({
+      type: EventTypes.UNHANDLEDREJECTION,
+      category: breadcrumb.getCategory(EventTypes.UNHANDLEDREJECTION),
+      time: getTimestamp(),
+      status: StatusCode.ERROR,
+      data,
+    });
+
+    const hash: string = getErrorUid(
+      `${EventTypes.UNHANDLEDREJECTION}-${message}-${fileName}-${columnNumber}`
+    );
+    // 开启repeatCodeError第一次报错才上报
+    if (!options.repeatCodeError || (options.repeatCodeError && !hashMapExist(hash))) {
+      transportData.send(data);
+    }
+  },
+
   handleWhiteScreen(): void {
-    openWithScreen((res: any) => {
+    openWhiteScreen((res: any) => {
       // 上报白屏检测信息
       transportData.send({
         type: EventTypes.WHITE_SCREEN,

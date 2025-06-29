@@ -5,3 +5,6 @@ export * from './replace';
 export * from './reportData';
 export * from './setupReplace';
 export * from './subscribe';
+export * from './customLog';
+export * from './transformData';
+export * from './whiteScreen';

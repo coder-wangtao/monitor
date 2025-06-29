@@ -1,18 +1,23 @@
+//TODO:完成
+
+import { options } from './options';
+import { fromHttpStatus, interceptStr, getTimestamp } from '@monitor/utils';
 import { HttpCode, StatusCode } from '@monitor/common';
 import { HttpData, ResourceError, ResourceTarget } from '@monitor/types';
-import { options } from './options';
-import { fromHttpStatus, getTimestamp, interceptStr } from '@monitor/utils';
 
+// 处理接口的状态
 export function httpTransform(data: HttpData): HttpData {
   let message: any = '';
   const { elapsedTime, time, method = '', type, Status = 200, response, requestData } = data;
+
   let status: StatusCode;
+
   if (Status === 0) {
     status = StatusCode.ERROR;
     message =
       elapsedTime <= options.overTime * 1000
-        ? `请求失败，Status的值为:${Status}`
-        : `请求失败，接口超时`;
+        ? `请求失败，Status值为:${Status}`
+        : '请求失败，接口超时';
   } else if ((Status as number) < HttpCode.BAD_REQUEST) {
     status = StatusCode.OK;
     if (options.handleHttpStatus && typeof options.handleHttpStatus == 'function') {
@@ -21,16 +26,17 @@ export function httpTransform(data: HttpData): HttpData {
       } else {
         status = StatusCode.ERROR;
         message = `接口报错，报错信息为：${
-          typeof response === 'object' ? JSON.stringify(response) : response
+          typeof response == 'object' ? JSON.stringify(response) : response
         }`;
       }
     }
   } else {
     status = StatusCode.ERROR;
-    message = `请求失败，Status值为：${Status},${fromHttpStatus(Status as number)}`;
+    message = `请求失败，Status值为:${Status}，${fromHttpStatus(Status as number)}`;
   }
 
-  message = `${data.url}；${message}`;
+  message = `${data.url}; ${message}`;
+
   return {
     url: data.url,
     time,
@@ -44,7 +50,7 @@ export function httpTransform(data: HttpData): HttpData {
     },
     response: {
       Status,
-      data: status === StatusCode.ERROR ? response : null,
+      data: status == StatusCode.ERROR ? response : null,
     },
   };
 }

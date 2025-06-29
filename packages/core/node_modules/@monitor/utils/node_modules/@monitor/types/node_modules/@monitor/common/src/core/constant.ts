@@ -1,5 +1,5 @@
 /**
- *接口错误状态
+ * 接口错误状态
  */
 export enum SpanStatus {
   Ok = 'ok',
@@ -58,8 +58,8 @@ export enum EventTypes {
   REACT = 'react',
   CUSTOM = 'custom',
   PERFORMANCE = 'performance',
-  RECORD_SCREEN = 'record_screen',
-  WHITE_SCREEN = 'white_screen',
+  RECORD_SCREEN = 'recordScreen',
+  WHITE_SCREEN = 'whiteScreen',
 }
 
 export enum HttpType {
@@ -73,8 +73,8 @@ export enum HttpCode {
 }
 
 export enum EMethods {
-  GET = 'GET',
+  Get = 'GET',
   Post = 'POST',
-  PUT = 'PUT',
-  DELETE = 'DELETE',
+  Put = 'PUT',
+  Delete = 'DELETE',
 }

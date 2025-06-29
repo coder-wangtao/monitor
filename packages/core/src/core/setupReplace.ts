@@ -1,43 +1,49 @@
+import { breadcrumb } from './index';
+import { htmlElementAsString, getTimestamp } from '@monitor/utils';
 import { EventTypes, StatusCode } from '@monitor/common';
-import { HandleEvents } from './handleEvent';
 import { addReplaceHandler } from './replace';
-import { getTimestamp, htmlElementAsString } from '@monitor/utils';
-import { breadCrumb } from './breadcrumb';
+import { HandleEvents } from './handleEvent';
 
 export function setupReplace(): void {
-  //重写XMLHttpRequest
+  // 白屏检测
+  addReplaceHandler({
+    callback: () => {
+      HandleEvents.handleWhiteScreen();
+    },
+    type: EventTypes.WHITE_SCREEN,
+  });
+  // 重写XMLHttpRequest
   addReplaceHandler({
     callback: data => {
       HandleEvents.handleHttp(data, EventTypes.XHR);
     },
     type: EventTypes.XHR,
   });
-
-  //重写fetch
+  // 重写fetch
   addReplaceHandler({
     callback: data => {
       HandleEvents.handleHttp(data, EventTypes.FETCH);
     },
     type: EventTypes.FETCH,
   });
-  //错误捕获
+  // 捕获错误
   addReplaceHandler({
     callback: error => {
       HandleEvents.handleError(error);
     },
     type: EventTypes.ERROR,
   });
-  //监听history模式路由变化
+  // 监听history模式路由的变化
   addReplaceHandler({
     callback: data => {
       HandleEvents.handleHistory(data);
     },
     type: EventTypes.HISTORY,
   });
-  // 添加handleUnhandledRejection事件
+  // 添加handleUnhandleRejection事件
   addReplaceHandler({
     callback: data => {
-      HandleEvents.handleUnhandledRejection(data);
+      HandleEvents.handleUnhandleRejection(data);
     },
     type: EventTypes.UNHANDLEDREJECTION,
   });
@@ -47,10 +53,10 @@ export function setupReplace(): void {
       // 获取html信息
       const htmlString = htmlElementAsString(data.data.activeElement as HTMLElement);
       if (htmlString) {
-        breadCrumb.push({
+        breadcrumb.push({
           type: EventTypes.CLICK,
           status: StatusCode.OK,
-          category: breadCrumb.getCategory(EventTypes.CLICK),
+          category: breadcrumb.getCategory(EventTypes.CLICK),
           data: htmlString,
           time: getTimestamp(),
         });
@@ -58,19 +64,11 @@ export function setupReplace(): void {
     },
     type: EventTypes.CLICK,
   });
-  //监听hashchange
+  // 监听hashchange
   addReplaceHandler({
     callback: (e: HashChangeEvent) => {
       HandleEvents.handleHashchange(e);
     },
     type: EventTypes.HASHCHANGE,
-  });
-
-  //白屏检测
-  addReplaceHandler({
-    callback: () => {
-      HandleEvents.handleWhiteScreen();
-    },
-    type: EventTypes.WHITE_SCREEN,
   });
 }

@@ -89,7 +89,6 @@ app.post('/reportData', async (req, res) => {
         errorList.push(data);
       }
     }
-    debugger;
     res.send({
       code: 200,
       meaage: '上报成功！',

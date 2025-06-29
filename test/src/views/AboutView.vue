@@ -18,7 +18,7 @@ export default {
     jsErr() {
       var num = new Number(12.34);
       console.log(num.toFixed(-1));
-    },
-  },
+    }
+  }
 };
 </script>

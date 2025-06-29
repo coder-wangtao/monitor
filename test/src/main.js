@@ -5,19 +5,20 @@ import store from './store';
 import ElementUI from 'element-ui';
 import 'element-ui/lib/theme-chalk/index.css';
 
-import Monitor from '../../packages/core/dist/index.esm';
+// import webSee from "../../packages/core/src";
+// import performance from "../../packages/performance/src";
+// import recordscreen from "../../packages/recordscreen/src";
+
+import webSee from '../../packages/core/dist/index.esm';
 import performance from '../../packages/performance/dist/index.esm';
 import recordscreen from '../../packages/recordscreen/dist/index.esm';
 
-// import webSee from '@websee/core';
-// import performance from '@websee/performance';
-// import recordscreen from '@websee/recordscreen';
-Vue.use(Monitor, {
+Vue.use(webSee, {
   dsn: 'http://localhost:8080/reportData',
   apiKey: 'abcd',
   silentWhiteScreen: true,
   skeletonProject: true,
-  repeatCodeError: false,
+  repeatCodeError: true,
   userId: '123',
   handleHttpStatus(data) {
     console.log('data', data);
@@ -31,8 +32,8 @@ Vue.use(Monitor, {
     }
   },
 });
-Monitor.use(performance);
-Monitor.use(recordscreen, { recordScreentime: 15 });
+webSee.use(performance);
+webSee.use(recordscreen, { recordScreentime: 15 });
 
 Vue.use(ElementUI, { size: 'mini' });
 Vue.config.productionTip = false;

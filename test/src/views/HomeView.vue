@@ -112,30 +112,35 @@ export default {
     getTableData() {
       setTimeout(() => {
         fetch(`http://localhost:8083/getErrorList`)
-          .then(response => {
-            return response.json();
-          })
+          .then(response => response.json())
           .then(res => {
             this.tableData = res.data;
           });
       }, 500);
     },
     fetchError() {
-      fetch('https://jsonplaceholder.typicode.com/posts/a', {
-        method: 'POST',
-        header: {
-          'Content-Type': 'application/json;charset=UTF-8',
-        },
-        body: { id: 1 },
-      })
-        .then(res => {
-          if (res.status == 404) {
-            this.getTableData();
-          }
+      try {
+        fetch('https://abc.com/test/api', {
+          method: 'POST',
+          header: {
+            'Content-Type': 'application/json;charset=UTF-8',
+          },
+          body: { id: 1 },
         })
-        .catch(() => {
-          this.getTableData();
-        });
+          .then(res => {
+            debugger;
+            if (res.status == 404) {
+              this.getTableData();
+            }
+          })
+          .catch(() => {
+            debugger;
+            this.getTableData();
+          });
+      } catch (err) {
+        debugger;
+        this.getTableData();
+      }
     },
     revertBehavior({ breadcrumb }) {
       this.dialogTitle = '查看用户行为';

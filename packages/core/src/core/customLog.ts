@@ -1,21 +1,26 @@
 import ErrorStackParser from 'error-stack-parser';
-import { EventTypes, StatusCode } from '@monitor/common';
-import { getTimestamp, isError, unknownToString } from '@monitor/utils';
-import { breadCrumb } from './breadcrumb';
 import { transportData } from './reportData';
+import { breadcrumb } from './breadcrumb';
+import { EventTypes, StatusCode } from '@monitor/common';
+import { isError, getTimestamp, unknownToString } from '@monitor/utils';
 
-//自定义上报事件
+// 自定义上报事件
 export function log({ message = 'customMsg', error = '', type = EventTypes.CUSTOM }: any): void {
   try {
     let errorInfo = {};
     if (isError(error)) {
       const result = ErrorStackParser.parse(!error.target ? error : error.error || error.reason)[0];
-      errorInfo = { ...result, line: result.lineNumber, column: result.columnNumber };
+
+      errorInfo = {
+        ...result,
+        line: result.lineNumber,
+        column: result.columnNumber,
+      };
     }
-    breadCrumb.push({
+    breadcrumb.push({
       type,
       status: StatusCode.ERROR,
-      category: breadCrumb.getCategory(EventTypes.CUSTOM),
+      category: breadcrumb.getCategory(EventTypes.CUSTOM),
       data: unknownToString(message),
       time: getTimestamp(),
     });
@@ -26,7 +31,7 @@ export function log({ message = 'customMsg', error = '', type = EventTypes.CUSTO
       time: getTimestamp(),
       ...errorInfo,
     });
-  } catch (error) {
-    console.log('上报自定义事件时报错：', error);
+  } catch (err) {
+    // console.log('上报自定义事件时报错：', err);
   }
 }
