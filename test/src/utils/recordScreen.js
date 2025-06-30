@@ -2,6 +2,7 @@ import { Base64 } from 'js-base64';
 import pako from 'pako';
 
 // 解压
+//unzip 函数，用来解压经过 Base64 编码并经过 gzip 压缩的数据
 export function unzip(b64Data) {
   let strData = Base64.atob(b64Data);
   let charData = strData.split('').map(function (x) {

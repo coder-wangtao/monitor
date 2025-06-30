@@ -128,7 +128,6 @@ export default {
           body: { id: 1 },
         })
           .then(res => {
-            debugger;
             if (res.status == 404) {
               this.getTableData();
             }
@@ -143,6 +142,7 @@ export default {
       }
     },
     revertBehavior({ breadcrumb }) {
+      debugger;
       this.dialogTitle = '查看用户行为';
       this.fullscreen = false;
       this.revertdialog = true;
@@ -176,6 +176,7 @@ export default {
       });
     },
     playRecord(id) {
+      debugger;
       fetch(`http://localhost:8083/getRecordScreenId?id=${id}`)
         .then(response => response.json())
         .then(res => {
@@ -195,6 +196,9 @@ export default {
                 },
                 {
                   UNSAFE_replayCanvas: true,
+                  //这个选项允许 rrwebPlayer 回放 canvas 元素的绘制内容。
+                  //在 rrweb 中，某些图形内容可能是在 canvas 上绘制的，而这些内容通常是不可回放的。启用 UNSAFE_replayCanvas: true 可以让播放器回放这些 canvas 元素的内容。
+                  //由于 canvas 的内容通常会被绘制为图像或图形，并且这些图形通常不包含原始的 DOM 结构，所以通过 UNSAFE_replayCanvas 配置可以让 rrwebPlayer 特别处理 canvas 元素并将它们回放
                 }
               );
             });

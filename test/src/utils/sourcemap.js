@@ -12,6 +12,7 @@ function repalceAll(str) {
 }
 
 // 获取文件路径
+//搞定
 function getFileLink(str) {
   const reg = /vue-loader-options!\.(.*)\?/;
   const res = str.match(reg);
@@ -21,6 +22,8 @@ function getFileLink(str) {
   }
 }
 
+//开发环境：报错是在vue源文件报错的，直接通过fileName取本地开发文件
+//生产环境：报错是在js文件报错的，根据fileName找到对应的.map文件，之后
 function loadSourceMap(fileName) {
   let file,
     env = process.env.NODE_ENV;
@@ -30,6 +33,7 @@ function loadSourceMap(fileName) {
     file = matchStr(fileName);
   }
   if (!file) return;
+
   return new Promise(resolve => {
     fetch(`http://localhost:8083/getmap?fileName=${file}&env=${env}`).then(response => {
       if (env == 'development') {
@@ -41,8 +45,23 @@ function loadSourceMap(fileName) {
   });
 }
 
+//生产环境：
+//利用.map文件，使用第三方包source-map-js解析.map映射文件，根据错误行行号、列号找到对应的原始源代码中的位置。
+//判断是否为第三方包报错，如果是第三方包报错，因为项目引入的是打包后的文件，缺少三方的map文件,报错。
+//根据报错文件的在当前所有文件的索引，知道对应的报错文件的内容的索引，从而找到对应的报错文件的内容。
+//把对应的错误文件的代码通过split('\n')进行分割，形成一个数组。
+//根据报错的行号，找到数组的基于报错的行号前后5个索引，将报错代码显示在中间位置。
+//[].length = 10，意味着展示10行代码，根据行号找到对应的报错的行，做高亮展示
+
+//开发环境
+//直接可以拿到报错文件的代码
+//把对应的错误文件的代码通过split('\n')进行分割，形成一个数组。
+//根据报错的行号，找到数组的基于报错的行号前后5个索引，将报错代码显示在中间位置。
+//[].length = 10，意味着展示10行代码，根据行号找到对应的报错的行，做高亮展示。
+
 export const findCodeBySourceMap = async ({ fileName, line, column }, callback) => {
   let sourceData = await loadSourceMap(fileName);
+
   if (!sourceData) return;
   let result, codeList;
   if (process.env.NODE_ENV == 'development') {
@@ -64,7 +83,11 @@ export const findCodeBySourceMap = async ({ fileName, line, column }, callback) 
     });
   } else {
     let { sourcesContent, sources } = sourceData;
+    //sourcesContent, sources，它们分别表示源文件的内容和源文件的路径。
+    //sourcesContent:表示源文件的内容
+    //sources:表示源文件的路径
     let consumer = await new sourceMap.SourceMapConsumer(sourceData);
+
     result = consumer.originalPositionFor({
       line: Number(line),
       column: Number(column),
