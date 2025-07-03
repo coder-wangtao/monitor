@@ -11,6 +11,7 @@ export class Queue {
       return;
     }
     this.stack.push(fn);
+
     if (!this.isFlushing) {
       this.isFlushing = true;
       // 优先使用requestIdleCallback

@@ -21,14 +21,14 @@ export function htmlElementAsString(target: HTMLElement) {
 }
 
 export function setSilentFlag({
-  silentXhr = true,
-  silentFetch = true,
-  silentClick = true,
-  silentHistory = true,
-  silentError = true,
-  silentHashchange = true,
-  silentUnhandledrejection = true,
-  silentWhiteScreen = false,
+  silentXhr = true, //是否监听Xhr
+  silentFetch = true, //是否监听Fetch
+  silentClick = true, //是否监听click
+  silentHistory = true, //是否监听history
+  silentError = true, //是否监听Error
+  silentHashchange = true, //是否监听Hashchange
+  silentUnhandledrejection = true, //是否监听Unhandledrejection
+  silentWhiteScreen = false, //是否监听白屏
 }): void {
   setFlag(EventTypes.XHR, !silentXhr);
   setFlag(EventTypes.FETCH, !silentFetch);

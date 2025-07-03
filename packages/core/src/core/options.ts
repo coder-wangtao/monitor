@@ -49,6 +49,7 @@ const options = _support.options || (_support.options = new Options());
 
 export function handleOptions(paramOptions: InitOptions): void {
   // setSilentFlag 给全局添加已设置的标识，防止重复设置
+  //初始化标识
   setSilentFlag(paramOptions);
   // 设置用户行为的配置项
   breadcrumb.bindOptions(paramOptions);
