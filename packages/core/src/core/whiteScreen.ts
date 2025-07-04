@@ -130,6 +130,7 @@ export function openWhiteScreen(
       idleCallback();
     }, 1000);
   }
+
   function idleCallback() {
     if ('requestIdleCallback' in _global) {
       requestIdleCallback(deadline => {
