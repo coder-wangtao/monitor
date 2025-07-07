@@ -32,6 +32,7 @@ Vue.use(webSee, {
     }
   },
 });
+debugger;
 webSee.use(performance);
 webSee.use(recordscreen, { recordScreentime: 15 });
 

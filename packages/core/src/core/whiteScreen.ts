@@ -49,6 +49,8 @@ export function openWhiteScreen(
   }
 
   // 选中dom点的名称
+  //id => #app
+  //class => .home.menu
   function getSelector(element: any) {
     if (element.id) {
       return '#' + element.id;
@@ -65,6 +67,7 @@ export function openWhiteScreen(
       return element.nodeName.toLowerCase();
     }
   }
+
   // 判断采样点是否为容器节点
   function isContainer(element: HTMLElement) {
     const selector = getSelector(element);
@@ -73,6 +76,7 @@ export function openWhiteScreen(
     }
     return whiteBoxElements?.indexOf(selector) != -1;
   }
+
   // 采样对比
   function sampling() {
     let emptyPoints = 0;
@@ -119,6 +123,7 @@ export function openWhiteScreen(
       status: emptyPoints == 17 ? StatusCode.ERROR : StatusCode.OK,
     });
   }
+
   // 开启白屏轮训
   function openWhiteLoop(): void {
     if (_support._loopTimer) return;
@@ -128,7 +133,7 @@ export function openWhiteScreen(
         _skeletonNowList = [];
       }
       idleCallback();
-    }, 1000);
+    }, _support._loopTimer);
   }
 
   function idleCallback() {
