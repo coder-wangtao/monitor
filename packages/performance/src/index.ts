@@ -37,6 +37,7 @@ export default class WebPerformance extends BasePlugin {
         });
       }
     });
+
     observer.observe({ entryTypes: ['longtask'] });
 
     on(_global, 'load', function () {
