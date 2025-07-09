@@ -11,6 +11,7 @@ export function handleScreen(transportData: any, recordScreenTime: number): void
   // let stopFn = record({
   record({
     emit(event, isCheckout: any) {
+      //isCheckout 表示新的录屏
       if (isCheckout) {
         // 此段时间内发生错误，上报录屏信息
         if (_support.hasError) {
