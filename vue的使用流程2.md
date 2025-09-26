@@ -2,6 +2,7 @@
 monitor.use(performance);
 monitor.use(recordscreen, { recordScreentime: 15 });
 core 里的 use 逻辑会走 new recordscreen、new performance，调用 recordscreen/performance 的主要逻辑
+针对以上 recordscreen，performance，都会有一个 callback,譬如{ recordscreen: [ handleHttpCallback ] }，这相当于一个 subscribe。同时还有一个 notify,去执行 recordscreen 里[]的 handleHttpCallback。
 
 1 performance(走到 performance 逻辑)
 1.1 PerformanceObserver 监听 longTask 上报
@@ -15,6 +16,9 @@ PerformanceObserver 检查是否为'first-contentful-paint'事件，根据 FCP �
 PerformanceObserver 检查是否为'largest-contentful-paint'事件，根据 LCP 的时间来判断评分。若 LCP 时间大于 2500ms，则为 poor，否则为 good。上报数据。
 1.3.4 CLS(累计布局偏移)(Cumulative Layout Shift):用于衡量页面在加载过程中的视觉稳定性。具体来说，它衡量了页面中元素的布局变化，越少的布局偏移意味着页面越稳定。
 通过监听 PerformanceObserver 中的 layout-shift 事件来捕捉页面的布局变化。通过对会话的管理，代码确保了累积的布局偏移是合理的，评分：若 CLS 值大于 2500，则为 poor，否则为 good。
+
+const { responseStart, navigationStart } = \_global.performance.timing;
+const value = responseStart - navigationStart;
 1.3.5 TTFB 首字节时间（Time to First Byte）:TTFB 是指浏览器从发起请求到接收到第一个字节的时间，反映了服务器的响应速度，通常用于评估服务器的性能。
 TTFB 是通过 responseStart - navigationStart 计算的，表示从发起请求到接收到响应的第一个字节的时间，根据 TTFB 的值判断评分。如果 TTFB 大于 100ms，则为 'poor'，否则为 'good'。
 
@@ -24,7 +28,7 @@ TTFB 是通过 responseStart - navigationStart 计算的，表示从发起请求
 2.3 如何只上报报错时的录屏信息呢 ？
 2.3.1 window 上设置 hasError、recordScreenId 变量，hasError 用来判断某段时间代码是否报错；recordScreenId 用来记录此次录屏的 id
 2.3.2 当页面发生错误需要上报时，先判断是否开启了录屏，如果开启了，将 hasError 设为 true，同时将 window 上的 recordScreenId 存储到此次上报信息的 data 中
-2.3.3 rrweb 设置 10s/次 录制快照的频率，每次重置录屏时，判断 hasError 是否为 true（即这段时间内是否发生报错），如果有发生错误，将这次的录屏信息上报，并重置录屏信息和 recordScreenId，作为下次录屏使用
+2.3.3 rrweb 设置 10s/次 录制快照的频率，每次重置录屏时，判断 hasError 是否为 true（即这段时间内是否发生报错），如果有发生错误，将这次的录屏信息上报，并重置录屏信息和 recordScreenId，重置 hasError 为 false,作为下次录屏使用。
 2.3.4 后台报错列表，从本次报错报的 data 中取出 recordScreenId 来播放录屏
 2.4 压缩上报数据
 2.4.1 如果一直录屏，数据量是巨大的，实测下来，录制 10s 的时长，数据大小约为 8M 左右（页面的不同复杂度、用户不同操作的频率都会造成大小不一样）
